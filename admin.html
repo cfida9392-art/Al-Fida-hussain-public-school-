@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.png" alt="Logo">
+        <div class="info">
+          <h2>AL FIDA HUSSAIN PUBLIC SCHOOLS</h2>
+          <span>Admin Panel</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Main</div>
+        <a href="#" class="active" data-page="dashboard" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#" data-page="students" onclick="showPage('students')"><i class="fas fa-user-graduate"></i> Students</a>
+        <a href="#" data-page="parents" onclick="showPage('parents')"><i class="fas fa-users"></i> Parents</a>
+        <a href="#" data-page="teachers" onclick="showPage('teachers')"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+        <a href="#" data-page="classes" onclick="showPage('classes')"><i class="fas fa-school"></i> Classes</a>
+        <div class="nav-section">Academic</div>
+        <a href="#" data-page="attendance" onclick="showPage('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
+        <a href="#" data-page="exams" onclick="showPage('exams')"><i class="fas fa-file-alt"></i> Exams</a>
+        <a href="#" data-page="results" onclick="showPage('results')"><i class="fas fa-chart-bar"></i> Results</a>
+        <a href="#" data-page="timetable" onclick="showPage('timetable')"><i class="fas fa-clock"></i> Timetable</a>
+        <a href="#" data-page="homework" onclick="showPage('homework')"><i class="fas fa-book"></i> Homework</a>
+        <div class="nav-section">Finance</div>
+        <a href="#" data-page="fees" onclick="showPage('fees')"><i class="fas fa-money-bill-wave"></i> Fees</a>
+        <a href="#" data-page="defaulters" onclick="showPage('defaulters')"><i class="fas fa-exclamation-circle"></i> Fee Defaulters</a>
+        <a href="#" data-page="payroll" onclick="showPage('payroll')"><i class="fas fa-wallet"></i> Payroll</a>
+        <div class="nav-section">Communication</div>
+        <a href="#" data-page="whatsapp" onclick="showPage('whatsapp')"><i class="fab fa-whatsapp"></i> WhatsApp Contacts</a>
+        <a href="#" data-page="bulkwa" onclick="showPage('bulkwa')"><i class="fas fa-comments"></i> Bulk WhatsApp</a>
+        <a href="#" data-page="notices" onclick="showPage('notices')"><i class="fas fa-bullhorn"></i> Notices</a>
+        <a href="#" data-page="events" onclick="showPage('events')"><i class="fas fa-calendar-alt"></i> Events</a>
+        <div class="nav-section">More</div>
+        <a href="#" data-page="admissions" onclick="showPage('admissions')"><i class="fas fa-user-plus"></i> Admissions</a>
+        <a href="#" data-page="library" onclick="showPage('library')"><i class="fas fa-book-open"></i> Library</a>
+        <a href="#" data-page="transport" onclick="showPage('transport')"><i class="fas fa-bus"></i> Transport</a>
+        <a href="#" data-page="idcards" onclick="showPage('idcards')"><i class="fas fa-id-card"></i> ID Cards</a>
+        <a href="#" data-page="certificates" onclick="showPage('certificates')"><i class="fas fa-certificate"></i> Certificates</a>
+        <a href="#" data-page="reports" onclick="showPage('reports')"><i class="fas fa-chart-pie"></i> Reports</a>
+        <a href="#" data-page="notifications" onclick="showPage('notifications')"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#" data-page="settings" onclick="showPage('settings')"><i class="fas fa-cog"></i> Settings</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div>
+            <div class="user-name" id="user-name">Admin</div>
+            <div class="user-role">Super Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <h1 id="page-title">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="global-search" placeholder="Search..." oninput="globalSearch(this.value)">
+          </div>
+          <button class="topbar-btn" onclick="toggleTheme()" title="Theme"><i class="fas fa-moon"></i></button>
+          <button class="topbar-btn" onclick="showPage('notifications')" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="badge-count" id="notif-badge">0</span>
+          </button>
+          <button class="topbar-btn" onclick="openSchoolWhatsApp()" title="WhatsApp">
+            <i class="fab fa-whatsapp" style="color:#25d366;"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div id="page-dashboard" class="page-section">
+          <div class="stats-grid" id="dashboard-stats"></div>
+          <div class="charts-grid">
+            <div class="chart-card"><h3>Students by Class</h3><div class="simple-chart" id="chart-students"></div></div>
+            <div class="chart-card"><h3>Today's Attendance</h3><div id="chart-attendance" style="padding:20px;"></div></div>
+            <div class="chart-card"><h3>Fee Collection</h3><div id="chart-fees" style="padding:20px;"></div></div>
+            <div class="chart-card"><h3>Recent Notifications</h3><div id="dashboard-notifs" style="max-height:220px;overflow-y:auto;"></div></div>
+          </div>
+        </div>
+
+        <div id="page-students" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3><i class="fas fa-user-graduate"></i> Students</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddStudentModal()"><i class="fas fa-plus"></i> Add Student</button>
+            </div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="student-search" placeholder="Search..." oninput="loadStudents()">
+                <select class="form-control" id="student-class-filter" onchange="loadStudents()"><option value="">All Classes</option></select>
+                <select class="form-control" id="student-section-filter" onchange="loadStudents()">
+                  <option value="">All Sections</option><option value="A">A</option><option value="B">B</option>
+                </select>
+                <select class="form-control" id="student-status-filter" onchange="loadStudents()">
+                  <option value="">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option>
+                </select>
+                <button class="btn btn-sm" style="background:var(--gray-200);" onclick="exportToCSV(generateStudentReport(),'students.csv')"><i class="fas fa-file-csv"></i> Export</button>
+              </div>
+              <div id="students-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-parents" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3><i class="fas fa-users"></i> Parents</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddParentModal()"><i class="fas fa-plus"></i> Add Parent</button>
+            </div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="parent-search" placeholder="Search..." oninput="loadParents()">
+              </div>
+              <div id="parents-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-teachers" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3><i class="fas fa-chalkboard-teacher"></i> Teachers</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddTeacherModal()"><i class="fas fa-plus"></i> Add Teacher</button>
+            </div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="teacher-search" placeholder="Search..." oninput="loadTeachers()">
+              </div>
+              <div id="teachers-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-classes" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Classes & Subjects</h3></div>
+            <div class="content-card-body">
+              <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(this,'tab-classes')">Classes</button>
+                <button class="tab-btn" onclick="switchTab(this,'tab-subjects')">Subjects</button>
+              </div>
+              <div id="tab-classes" class="tab-content active"><div id="classes-list"></div></div>
+              <div id="tab-subjects" class="tab-content"><div id="subjects-list"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-attendance" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Attendance</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="date" class="form-control" id="att-date" onchange="loadAttendanceForm()">
+                <select class="form-control" id="att-class" onchange="loadAttendanceForm()"></select>
+                <select class="form-control" id="att-section" onchange="loadAttendanceForm()">
+                  <option value="A">A</option><option value="B">B</option>
+                </select>
+                <button class="btn btn-sm btn-whatsapp" onclick="showAbsentWhatsApp()"><i class="fab fa-whatsapp"></i> Absent WhatsApp</button>
+              </div>
+              <div id="attendance-form"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-fees" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Fee Management</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddFeeModal()"><i class="fas fa-plus"></i> Add Payment</button>
+            </div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="fee-search" placeholder="Search..." oninput="loadFees()">
+                <select class="form-control" id="fee-status-filter" onchange="loadFees()">
+                  <option value="">All</option><option value="pending">Pending</option><option value="paid">Paid</option>
+                </select>
+                <button class="btn btn-sm" style="background:var(--gray-200);" onclick="exportToCSV(generateFeeReport(),'fees.csv')"><i class="fas fa-file-csv"></i> Export</button>
+              </div>
+              <div id="fees-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-defaulters" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Fee Defaulters</h3></div>
+            <div class="content-card-body"><div id="defaulters-table"></div></div>
+          </div>
+        </div>
+
+        <div id="page-exams" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Exams</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddExamModal()"><i class="fas fa-plus"></i> Add Exam</button>
+            </div>
+            <div class="content-card-body"><div id="exams-table"></div></div>
+          </div>
+        </div>
+
+        <div id="page-results" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Results</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="result-search" placeholder="Search..." oninput="loadResults()">
+              </div>
+              <div id="results-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-timetable" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Timetable</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <select class="form-control" id="tt-class" onchange="loadTimetable()"></select>
+                <select class="form-control" id="tt-section" onchange="loadTimetable()">
+                  <option value="A">A</option><option value="B">B</option>
+                </select>
+              </div>
+              <div id="timetable-view"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-homework" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Homework</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddHomeworkModal()"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div class="content-card-body"><div id="homework-table"></div></div>
+          </div>
+        </div>
+
+        <div id="page-whatsapp" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3><i class="fab fa-whatsapp"></i> Student WhatsApp Contacts</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <input type="text" class="form-control search-input" id="wa-search" placeholder="Search..." oninput="loadWhatsAppContacts()">
+                <select class="form-control" id="wa-class" onchange="loadWhatsAppContacts()"></select>
+                <select class="form-control" id="wa-section" onchange="loadWhatsAppContacts()">
+                  <option value="">All Sections</option><option value="A">A</option><option value="B">B</option>
+                </select>
+              </div>
+              <div id="wa-contacts-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-bulkwa" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Bulk WhatsApp</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <select class="form-control" id="bulk-type" onchange="loadBulkWA()">
+                  <option value="all_parents">All Parents</option>
+                  <option value="class">By Class</option>
+                  <option value="absent">Absent Students</option>
+                  <option value="fee_defaulters">Fee Defaulters</option>
+                </select>
+                <select class="form-control" id="bulk-class" onchange="loadBulkWA()"></select>
+                <select class="form-control" id="bulk-section" onchange="loadBulkWA()">
+                  <option value="">All</option><option value="A">A</option><option value="B">B</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Message Template</label>
+                <textarea class="form-control" id="bulk-wa-message" rows="3">Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS regarding your child {{studentName}} (Class {{className}}).</textarea>
+              </div>
+              <button class="btn btn-primary btn-sm mb-2" onclick="loadBulkWA()"><i class="fas fa-sync"></i> Generate Links</button>
+              <div id="bulk-wa-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-admissions" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Admissions</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <select class="form-control" id="adm-status" onchange="loadAdmissions()">
+                  <option value="">All</option>
+                  <option value="new">New</option>
+                  <option value="under_review">Under Review</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="enrolled">Enrolled</option>
+                </select>
+              </div>
+              <div id="admissions-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-notices" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Notices</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddNoticeModal()"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div class="content-card-body"><div id="notices-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-events" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Events</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddEventModal()"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div class="content-card-body"><div id="events-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-library" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Library</h3></div>
+            <div class="content-card-body"><div id="library-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-transport" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Transport</h3></div>
+            <div class="content-card-body"><div id="transport-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-payroll" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Payroll</h3></div>
+            <div class="content-card-body"><div id="payroll-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-idcards" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>ID Card Generator</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <select class="form-control" id="idcard-student" onchange="generateIDCard()"><option value="">Select Student</option></select>
+                <button class="btn btn-sm btn-primary no-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+              </div>
+              <div id="idcard-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-certificates" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Certificate Generator</h3></div>
+            <div class="content-card-body">
+              <div class="filters-bar">
+                <select class="form-control" id="cert-type">
+                  <option value="character">Character Certificate</option>
+                  <option value="leaving">School Leaving Certificate</option>
+                  <option value="achievement">Achievement Certificate</option>
+                  <option value="participation">Participation Certificate</option>
+                </select>
+                <select class="form-control" id="cert-student"></select>
+                <button class="btn btn-sm btn-primary" onclick="generateCertificate()">Generate</button>
+                <button class="btn btn-sm no-print" style="background:var(--gray-200);" onclick="window.print()">Print</button>
+              </div>
+              <div id="certificate-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-reports" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Reports</h3></div>
+            <div class="content-card-body">
+              <div class="cards-grid">
+                <div class="card" style="cursor:pointer;" onclick="exportToCSV(generateStudentReport(),'students_report.csv')">
+                  <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+                  <h3>Students Report</h3><p>Export students CSV</p>
+                </div>
+                <div class="card" style="cursor:pointer;" onclick="exportToCSV(generateFeeReport(),'fees_report.csv')">
+                  <div class="card-icon"><i class="fas fa-money-bill"></i></div>
+                  <h3>Fees Report</h3><p>Export fees CSV</p>
+                </div>
+                <div class="card" style="cursor:pointer;" onclick="exportToCSV(generateDefaulterReport(),'defaulters_report.csv')">
+                  <div class="card-icon"><i class="fas fa-exclamation"></i></div>
+                  <h3>Defaulters Report</h3><p>Export defaulters CSV</p>
+                </div>
+                <div class="card" style="cursor:pointer;" onclick="exportToCSV(generateAttendanceReport(),'attendance_report.csv')">
+                  <div class="card-icon"><i class="fas fa-calendar"></i></div>
+                  <h3>Attendance Report</h3><p>Export attendance CSV</p>
+                </div>
+                <div class="card" style="cursor:pointer;" onclick="exportWhatsAppCSV()">
+                  <div class="card-icon"><i class="fab fa-whatsapp"></i></div>
+                  <h3>WhatsApp Contacts</h3><p>Export contacts CSV</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-notifications" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header">
+              <h3>Notifications</h3>
+              <button class="btn btn-sm" style="background:var(--gray-200);" onclick="markAllAsRead();renderNotifications('notifications-list');updateNotifBadge();">Mark All Read</button>
+            </div>
+            <div class="content-card-body"><div id="notifications-list"></div></div>
+          </div>
+        </div>
+
+        <div id="page-settings" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Settings</h3></div>
+            <div class="content-card-body">
+              <div class="form-group"><label>School Name</label><input type="text" class="form-control" id="setting-schoolName"></div>
+              <div class="form-group"><label>Tagline</label><input type="text" class="form-control" id="setting-tagline"></div>
+              <div class="form-group"><label>WhatsApp</label><input type="text" class="form-control" id="setting-whatsapp"></div>
+              <div class="form-group"><label>Phone</label><input type="text" class="form-control" id="setting-phone"></div>
+              <div class="form-group"><label>Email</label><input type="email" class="form-control" id="setting-email"></div>
+              <div class="form-group"><label>Address</label><input type="text" class="form-control" id="setting-address"></div>
+              <div class="form-group"><label>Academic Session</label><input type="text" class="form-control" id="setting-academicSession"></div>
+              <button class="btn btn-primary" onclick="saveSettingsForm()"><i class="fas fa-save"></i> Save Settings</button>
+              <hr style="margin:24px 0;border-color:var(--gray-200);">
+              <button class="btn btn-danger" onclick="if(confirmAction('Reset all demo data?')){resetDatabase();location.reload();}"><i class="fas fa-trash"></i> Reset Demo Data</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="page-search" class="page-section" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Search Results</h3></div>
+            <div class="content-card-body"><div id="search-results"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Modal -->
+  <div class="modal-overlay" id="modal-student">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="student-modal-title">Add Student</h3>
+        <button class="modal-close" onclick="closeModal('modal-student')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="student-edit-id">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="form-group"><label>Student Name *</label><input type="text" class="form-control" id="stu-name"></div>
+          <div class="form-group"><label>Father Name *</label><input type="text" class="form-control" id="stu-father"></div>
+          <div class="form-group"><label>Mother Name</label><input type="text" class="form-control" id="stu-mother"></div>
+          <div class="form-group"><label>Date of Birth</label><input type="date" class="form-control" id="stu-dob"></div>
+          <div class="form-group"><label>Gender</label><select class="form-control" id="stu-gender"><option>Male</option><option>Female</option></select></div>
+          <div class="form-group"><label>Class *</label><select class="form-control" id="stu-class"></select></div>
+          <div class="form-group"><label>Section</label><select class="form-control" id="stu-section"><option>A</option><option>B</option></select></div>
+          <div class="form-group"><label>Roll Number</label><input type="number" class="form-control" id="stu-roll"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" class="form-control" id="stu-phone"></div>
+          <div class="form-group"><label>Father Phone</label><input type="tel" class="form-control" id="stu-father-phone"></div>
+          <div class="form-group"><label>Parent WhatsApp</label><input type="tel" class="form-control" id="stu-whatsapp"></div>
+          <div class="form-group"><label>Address</label><input type="text" class="form-control" id="stu-address"></div>
+          <div class="form-group"><label>Previous School</label><input type="text" class="form-control" id="stu-prev-school"></div>
+          <div class="form-group"><label>Status</label><select class="form-control" id="stu-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" style="background:var(--gray-200);" onclick="closeModal('modal-student')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveStudent()"><i class="fas fa-save"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div class="modal-overlay" id="modal-receipt">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3>Fee Receipt</h3>
+        <button class="modal-close" onclick="closeModal('modal-receipt')">&times;</button>
+      </div>
+      <div class="modal-body" id="receipt-content"></div>
+      <div class="modal-footer no-print">
+        <button class="btn" style="background:var(--gray-200);" onclick="closeModal('modal-receipt')">Close</button>
+        <button class="btn btn-primary" onclick="printElement('receipt-content','Fee Receipt')"><i class="fas fa-print"></i> Print</button>
+      </div>
+    </div>
+  </div>
+
+  <a href="https://wa.me/923168122916" target="_blank" class="floating-whatsapp no-print"><i class="fab fa-whatsapp"></i></a>
+
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/teachers.js"></script>
+  <script src="js/parents.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/fees.js"></script>
+  <script src="js/exams.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/timetable.js"></script>
+  <script src="js/homework.js"></script>
+  <script src="js/admissions.js"></script>
+  <script src="js/whatsapp.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/admin-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parent Portal | AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.png" alt="Logo">
+        <div class="info"><h2>AL FIDA HUSSAIN PUBLIC SCHOOLS</h2><span>Parent Portal</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" onclick="showPPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#" onclick="showPPage('children')"><i class="fas fa-child"></i> My Children</a>
+        <a href="#" onclick="showPPage('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
+        <a href="#" onclick="showPPage('fees')"><i class="fas fa-money-bill"></i> Fees</a>
+        <a href="#" onclick="showPPage('results')"><i class="fas fa-chart-bar"></i> Results</a>
+        <a href="#" onclick="showPPage('homework')"><i class="fas fa-book"></i> Homework</a>
+        <a href="#" onclick="showPPage('notices')"><i class="fas fa-bullhorn"></i> Notices</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">P</div>
+          <div><div class="user-name" id="p-name">Parent</div><div class="user-role">Parent</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <h1 id="p-title">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+          <a href="https://wa.me/923168122916?text=Assalam-o-Alaikum%2C%20Parent%20inquiry" target="_blank" class="topbar-btn"><i class="fab fa-whatsapp" style="color:#25d366;"></i></a>
+        </div>
+      </header>
+      <div class="page-content">
+        <div id="p-dashboard">
+          <div class="stats-grid" id="p-stats"></div>
+          <div class="content-card"><div class="content-card-header"><h3>My Children</h3></div>
+            <div class="content-card-body" id="p-children-cards"></div>
+          </div>
+        </div>
+        <div id="p-children" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>My Children</h3></div><div class="content-card-body" id="p-children-list"></div></div></div>
+        <div id="p-attendance" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Attendance</h3></div><div class="content-card-body" id="p-att-list"></div></div></div>
+        <div id="p-fees" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Fee Status</h3></div><div class="content-card-body" id="p-fee-list"></div></div></div>
+        <div id="p-results" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Results</h3></div><div class="content-card-body" id="p-result-list"></div></div></div>
+        <div id="p-homework" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Homework</h3></div><div class="content-card-body" id="p-hw-list"></div></div></div>
+        <div id="p-notices" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Notices</h3></div><div class="content-card-body" id="p-notice-list"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <a href="https://wa.me/923168122916" target="_blank" class="floating-whatsapp"><i class="fab fa-whatsapp"></i></a>
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/fees.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/homework.js"></script>
+  <script src="js/attendance.js"></script>
+  <script>
+    if (!requireAuth(['parent'])) {}
+    var sess = getCurrentUser();
+    if (sess) document.getElementById('p-name').textContent = sess.name;
+    var parentId = sess ? sess.parentId : 'PAR_001';
+    var parent = getParentById(parentId) || getAllParents()[0];
+    var children = parent ? (parent.children||[]).map(function(id){return getStudentById(id);}).filter(Boolean) : getAllStudents().slice(0,2);
+
+    function showPPage(page) {
+      ['dashboard','children','attendance','fees','results','homework','notices'].forEach(function(p){
+        var el = document.getElementById('p-'+p); if(el) el.style.display = p===page?'block':'none';
+      });
+      document.getElementById('p-title').textContent = page.charAt(0).toUpperCase()+page.slice(1);
+      closeSidebar();
+      if(page==='dashboard') loadPDash();
+      if(page==='children') loadPChildren();
+      if(page==='attendance') loadPAtt();
+      if(page==='fees') loadPFees();
+      if(page==='results') loadPResults();
+      if(page==='homework') loadPHomework();
+      if(page==='notices') loadPNotices();
+    }
+    function loadPDash() {
+      document.getElementById('p-stats').innerHTML =
+        '<div class="stat-card"><div class="icon blue"><i class="fas fa-child"></i></div><div class="info"><h3>'+children.length+'</h3><p>Children</p></div></div>'+
+        '<div class="stat-card"><div class="icon orange"><i class="fas fa-money-bill"></i></div><div class="info"><h3>'+getPendingFees().filter(function(f){return children.some(function(c){return c.id===f.studentId;});}).length+'</h3><p>Pending Fees</p></div></div>';
+      document.getElementById('p-children-cards').innerHTML = children.map(function(c){
+        return '<div class="card" style="margin-bottom:12px;"><strong>'+escapeHtml(c.name)+'</strong> - '+escapeHtml(c.className)+' '+escapeHtml(c.section)+
+          ' | Attendance: '+getStudentAttendancePercentage(c.id)+'%</div>';
+      }).join('');
+    }
+    function loadPChildren() {
+      document.getElementById('p-children-list').innerHTML = children.map(function(c){
+        return '<div class="card" style="margin-bottom:12px;"><h3>'+escapeHtml(c.name)+'</h3><p>Class: '+escapeHtml(c.className)+'-'+escapeHtml(c.section)+' | Roll: '+c.rollNo+
+          '</p><p>Admission: '+escapeHtml(c.admissionNo)+'</p></div>';
+      }).join('');
+    }
+    function loadPAtt() {
+      var html = '';
+      children.forEach(function(c){
+        var records = getRecords(DB_KEYS.attendance).filter(function(a){return a.studentId===c.id;}).slice(0,10);
+        html += '<h4>'+escapeHtml(c.name)+' ('+getStudentAttendancePercentage(c.id)+'%)</h4>';
+        html += records.map(function(r){return '<span class="badge badge-'+(r.status==='present'?'success':r.status==='absent'?'danger':'warning')+'" style="margin:2px;">'+r.date+': '+r.status+'</span>';}).join(' ')+'<br><br>';
+      });
+      document.getElementById('p-att-list').innerHTML = html || '<p>No records</p>';
+    }
+    function loadPFees() {
+      var fees = getAllFees().filter(function(f){return children.some(function(c){return c.id===f.studentId;});});
+      document.getElementById('p-fee-list').innerHTML = fees.length ? '<div class="table-responsive"><table class="data-table"><thead><tr><th>Student</th><th>Month</th><th>Total</th><th>Paid</th><th>Remaining</th><th>Status</th></tr></thead><tbody>'+
+        fees.map(function(f){return '<tr><td>'+escapeHtml(f.studentName)+'</td><td>'+escapeHtml(f.month)+'</td><td>'+formatCurrency(f.total)+'</td><td>'+formatCurrency(f.paid)+'</td><td>'+formatCurrency(f.remaining)+'</td><td><span class="badge badge-'+(f.status==='paid'?'success':'danger')+'">'+f.status+'</span></td></tr>';}).join('')+'</tbody></table></div>' : '<p>No fee records</p>';
+    }
+    function loadPResults() {
+      var results = getAllResults().filter(function(r){return children.some(function(c){return c.id===r.studentId;});});
+      document.getElementById('p-result-list').innerHTML = results.length ? '<div class="table-responsive"><table class="data-table"><thead><tr><th>Student</th><th>Exam</th><th>Subject</th><th>Marks</th><th>Grade</th></tr></thead><tbody>'+
+        results.map(function(r){return '<tr><td>'+escapeHtml(r.studentName)+'</td><td>'+escapeHtml(r.examName)+'</td><td>'+escapeHtml(r.subject)+'</td><td>'+r.obtainedMarks+'/'+r.totalMarks+'</td><td>'+r.grade+'</td></tr>';}).join('')+'</tbody></table></div>' : '<p>No results</p>';
+    }
+    function loadPHomework() {
+      renderHomeworkTable('p-hw-list');
+    }
+    function loadPNotices() {
+      var notices = getRecords(DB_KEYS.notices).filter(function(n){return n.published;});
+      document.getElementById('p-notice-list').innerHTML = notices.map(function(n){
+        return '<div class="card" style="margin-bottom:10px;"><strong>'+escapeHtml(n.title)+'</strong><p style="font-size:0.9rem;">'+escapeHtml(n.content)+'</p><small>'+formatDate(n.date)+'</small></div>';
+      }).join('') || '<p>No notices</p>';
+    }
+    document.addEventListener('DOMContentLoaded', loadPDash);
+  </script>
+</body>
+</html>

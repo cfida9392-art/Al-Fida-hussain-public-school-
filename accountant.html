@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accountant Portal | AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.png" alt="Logo">
+        <div class="info"><h2>AL FIDA HUSSAIN PUBLIC SCHOOLS</h2><span>Accountant</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" onclick="showAPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#" onclick="showAPage('fees')"><i class="fas fa-money-bill-wave"></i> Fees</a>
+        <a href="#" onclick="showAPage('defaulters')"><i class="fas fa-exclamation-circle"></i> Defaulters</a>
+        <a href="#" onclick="showAPage('payroll')"><i class="fas fa-wallet"></i> Payroll</a>
+        <a href="#" onclick="showAPage('reports')"><i class="fas fa-chart-pie"></i> Reports</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">A</div>
+          <div><div class="user-name">Accountant</div><div class="user-role">Accountant</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <h1 id="a-title">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+          <button class="topbar-btn" onclick="openSchoolWhatsApp()"><i class="fab fa-whatsapp" style="color:#25d366;"></i></button>
+        </div>
+      </header>
+      <div class="page-content">
+        <div id="a-dashboard">
+          <div class="stats-grid" id="a-stats"></div>
+        </div>
+        <div id="a-fees" style="display:none;">
+          <div class="content-card">
+            <div class="content-card-header"><h3>Fee Management</h3>
+              <button class="btn btn-primary btn-sm" onclick="addAFee()"><i class="fas fa-plus"></i> Add Payment</button>
+            </div>
+            <div class="content-card-body"><div id="a-fees-table"></div></div>
+          </div>
+        </div>
+        <div id="a-defaulters" style="display:none;">
+          <div class="content-card"><div class="content-card-header"><h3>Fee Defaulters</h3></div>
+            <div class="content-card-body"><div id="a-def-table"></div></div>
+          </div>
+        </div>
+        <div id="a-payroll" style="display:none;">
+          <div class="content-card"><div class="content-card-header"><h3>Payroll</h3></div>
+            <div class="content-card-body"><div id="a-payroll-table"></div></div>
+          </div>
+        </div>
+        <div id="a-reports" style="display:none;">
+          <div class="content-card"><div class="content-card-header"><h3>Reports</h3></div>
+            <div class="content-card-body">
+              <button class="btn btn-primary" onclick="exportToCSV(generateFeeReport(),'fees.csv')"><i class="fas fa-file-csv"></i> Export Fees</button>
+              <button class="btn btn-primary" style="margin-left:8px;" onclick="exportToCSV(generateDefaulterReport(),'defaulters.csv')"><i class="fas fa-file-csv"></i> Export Defaulters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="modal-receipt">
+    <div class="modal modal-lg">
+      <div class="modal-header"><h3>Fee Receipt</h3><button class="modal-close" onclick="closeModal('modal-receipt')">&times;</button></div>
+      <div class="modal-body" id="receipt-content"></div>
+      <div class="modal-footer no-print">
+        <button class="btn" style="background:var(--gray-200);" onclick="closeModal('modal-receipt')">Close</button>
+        <button class="btn btn-primary" onclick="printElement('receipt-content','Fee Receipt')"><i class="fas fa-print"></i> Print</button>
+      </div>
+    </div>
+  </div>
+  <a href="https://wa.me/923168122916" target="_blank" class="floating-whatsapp"><i class="fab fa-whatsapp"></i></a>
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/fees.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/whatsapp.js"></script>
+  <script>
+    if (!requireAuth(['accountant'])) {}
+    function showAPage(page) {
+      ['dashboard','fees','defaulters','payroll','reports'].forEach(function(p){
+        var el = document.getElementById('a-'+p); if(el) el.style.display = p===page?'block':'none';
+      });
+      document.getElementById('a-title').textContent = page.charAt(0).toUpperCase()+page.slice(1);
+      closeSidebar();
+      if(page==='dashboard') loadADash();
+      if(page==='fees') renderFeesTable('a-fees-table',{});
+      if(page==='defaulters') loadADef();
+      if(page==='payroll') loadAPayroll();
+    }
+    function loadADash() {
+      var pending = getPendingFees();
+      var today = getTodayCollection();
+      var allFees = getAllFees();
+      var totalPaid = allFees.reduce(function(s,f){return s+f.paid;},0);
+      document.getElementById('a-stats').innerHTML =
+        '<div class="stat-card"><div class="icon orange"><i class="fas fa-exclamation"></i></div><div class="info"><h3>'+pending.length+'</h3><p>Pending Fees</p></div></div>'+
+        '<div class="stat-card"><div class="icon green"><i class="fas fa-coins"></i></div><div class="info"><h3>'+formatCurrency(today)+'</h3><p>Today Collection</p></div></div>'+
+        '<div class="stat-card"><div class="icon blue"><i class="fas fa-money-bill"></i></div><div class="info"><h3>'+formatCurrency(totalPaid)+'</h3><p>Total Collected</p></div></div>'+
+        '<div class="stat-card"><div class="icon red"><i class="fas fa-hourglass"></i></div><div class="info"><h3>'+formatCurrency(pending.reduce(function(s,f){return s+f.remaining;},0))+'</h3><p>Outstanding</p></div></div>';
+    }
+    function addAFee() {
+      var stuId = prompt('Student ID (e.g. STU_001):'); if(!stuId) return;
+      var student = getStudentById(stuId); if(!student){showToast('Not found','error');return;}
+      var month = prompt('Month:','September 2025')||'September 2025';
+      var tuition = parseInt(prompt('Tuition:','3500'))||0;
+      var paid = parseInt(prompt('Paid:',String(tuition)))||0;
+      addFee({studentId:student.id,studentName:student.name,fatherName:student.fatherName,className:student.className,section:student.section,month:month,tuitionFee:tuition,admissionFee:0,examFee:0,transportFee:0,otherFee:0,discount:0,fine:0,paid:paid});
+      showToast('Payment recorded'); renderFeesTable('a-fees-table',{});
+    }
+    function viewFeeReceipt(id) {
+      var fee = getRecordById(DB_KEYS.fees,id); if(!fee) return;
+      document.getElementById('receipt-content').innerHTML = generateFeeReceiptHTML(fee);
+      openModal('modal-receipt');
+    }
+    function editFee(id) {
+      var fee = getRecordById(DB_KEYS.fees,id); if(!fee) return;
+      var paid = parseInt(prompt('Paid Amount:',fee.paid)); if(isNaN(paid)) return;
+      updateFee(id,Object.assign({},fee,{paid:paid})); showToast('Updated'); renderFeesTable('a-fees-table',{});
+    }
+    function loadADef() {
+      var fees = getPendingFees();
+      document.getElementById('a-def-table').innerHTML = fees.length ?
+        '<div class="table-responsive"><table class="data-table"><thead><tr><th>Student</th><th>Class</th><th>Month</th><th>Remaining</th><th>WhatsApp</th></tr></thead><tbody>'+
+        fees.map(function(f){return '<tr><td>'+escapeHtml(f.studentName)+'</td><td>'+escapeHtml(f.className)+'</td><td>'+escapeHtml(f.month)+'</td><td>'+formatCurrency(f.remaining)+'</td><td><button class="btn btn-sm btn-whatsapp" onclick="sendFeeReminder(\''+f.id+'\')"><i class="fab fa-whatsapp"></i></button></td></tr>';}).join('')+'</tbody></table></div>' : '<p>No defaulters</p>';
+    }
+    function loadAPayroll() {
+      var payroll = getRecords(DB_KEYS.payroll);
+      document.getElementById('a-payroll-table').innerHTML = '<div class="table-responsive"><table class="data-table"><thead><tr><th>Teacher</th><th>Month</th><th>Net Salary</th><th>Status</th></tr></thead><tbody>'+
+        payroll.map(function(p){return '<tr><td>'+escapeHtml(p.teacherName)+'</td><td>'+escapeHtml(p.month)+'</td><td>'+formatCurrency(p.netSalary)+'</td><td><span class="badge badge-success">'+p.status+'</span></td></tr>';}).join('')+'</tbody></table></div>';
+    }
+    document.addEventListener('DOMContentLoaded', loadADash);
+  </script>
+</body>
+</html>

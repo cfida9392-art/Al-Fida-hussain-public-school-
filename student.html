@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal | AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="dashboard-layout">
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.png" alt="Logo">
+        <div class="info"><h2>AL FIDA HUSSAIN PUBLIC SCHOOLS</h2><span>Student Portal</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" onclick="showSPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#" onclick="showSPage('profile')"><i class="fas fa-user"></i> My Profile</a>
+        <a href="#" onclick="showSPage('attendance')"><i class="fas fa-calendar-check"></i> Attendance</a>
+        <a href="#" onclick="showSPage('results')"><i class="fas fa-chart-bar"></i> Results</a>
+        <a href="#" onclick="showSPage('homework')"><i class="fas fa-book"></i> Homework</a>
+        <a href="#" onclick="showSPage('timetable')"><i class="fas fa-clock"></i> Timetable</a>
+        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">S</div>
+          <div><div class="user-name" id="s-name">Student</div><div class="user-role">Student</div></div>
+        </div>
+      </div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <h1 id="s-title">Dashboard</h1>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-btn" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        </div>
+      </header>
+      <div class="page-content">
+        <div id="s-dashboard">
+          <div class="stats-grid" id="s-stats"></div>
+          <div class="content-card"><div class="content-card-header"><h3>Welcome</h3></div>
+            <div class="content-card-body" id="s-welcome"></div>
+          </div>
+        </div>
+        <div id="s-profile" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>My Profile</h3></div><div class="content-card-body" id="s-profile-body"></div></div></div>
+        <div id="s-attendance" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Attendance</h3></div><div class="content-card-body" id="s-att-body"></div></div></div>
+        <div id="s-results" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Results</h3></div><div class="content-card-body" id="s-result-body"></div></div></div>
+        <div id="s-homework" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Homework</h3></div><div class="content-card-body" id="s-hw-body"></div></div></div>
+        <div id="s-timetable" style="display:none;"><div class="content-card"><div class="content-card-header"><h3>Timetable</h3></div><div class="content-card-body" id="s-tt-body"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/students.js"></script>
+  <script src="js/results.js"></script>
+  <script src="js/homework.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/timetable.js"></script>
+  <script>
+    if (!requireAuth(['student'])) {}
+    var sess = getCurrentUser();
+    if (sess) document.getElementById('s-name').textContent = sess.name;
+    var studentId = sess ? sess.studentId : 'STU_001';
+    var student = getStudentById(studentId) || getAllStudents()[0];
+
+    function showSPage(page) {
+      ['dashboard','profile','attendance','results','homework','timetable'].forEach(function(p){
+        var el = document.getElementById('s-'+p); if(el) el.style.display = p===page?'block':'none';
+      });
+      document.getElementById('s-title').textContent = page.charAt(0).toUpperCase()+page.slice(1);
+      closeSidebar();
+      if(page==='dashboard') loadSDash();
+      if(page==='profile') loadSProfile();
+      if(page==='attendance') loadSAtt();
+      if(page==='results') loadSResults();
+      if(page==='homework') renderHomeworkTable('s-hw-body',{className:student?student.className:''});
+      if(page==='timetable') renderTimetable('s-tt-body',student?student.className:'Class 5',student?student.section:'A');
+    }
+    function loadSDash() {
+      if(!student) return;
+      var pct = getStudentAttendancePercentage(student.id);
+      document.getElementById('s-stats').innerHTML =
+        '<div class="stat-card"><div class="icon green"><i class="fas fa-percentage"></i></div><div class="info"><h3>'+pct+'%</h3><p>Attendance</p></div></div>'+
+        '<div class="stat-card"><div class="icon blue"><i class="fas fa-book"></i></div><div class="info"><h3>'+getAllHomework().filter(function(h){return h.className===student.className;}).length+'</h3><p>Homework</p></div></div>';
+      document.getElementById('s-welcome').innerHTML = '<p>Welcome, <strong>'+escapeHtml(student.name)+'</strong>!</p><p>Class: '+escapeHtml(student.className)+' - '+escapeHtml(student.section)+' | Roll: '+student.rollNo+'</p>';
+    }
+    function loadSProfile() {
+      if(!student) return;
+      document.getElementById('s-profile-body').innerHTML =
+        '<div class="info-grid">'+
+        '<div class="info-item"><label>Name</label><span>'+escapeHtml(student.name)+'</span></div>'+
+        '<div class="info-item"><label>Father</label><span>'+escapeHtml(student.fatherName)+'</span></div>'+
+        '<div class="info-item"><label>Class</label><span>'+escapeHtml(student.className)+' - '+escapeHtml(student.section)+'</span></div>'+
+        '<div class="info-item"><label>Roll No</label><span>'+student.rollNo+'</span></div>'+
+        '<div class="info-item"><label>Admission No</label><span>'+escapeHtml(student.admissionNo)+'</span></div>'+
+        '<div class="info-item"><label>DOB</label><span>'+formatDate(student.dob)+'</span></div></div>';
+    }
+    function loadSAtt() {
+      if(!student) return;
+      var records = getRecords(DB_KEYS.attendance).filter(function(a){return a.studentId===student.id;});
+      document.getElementById('s-att-body').innerHTML = '<p>Attendance: <strong>'+getStudentAttendancePercentage(student.id)+'%</strong></p>'+
+        records.slice(0,20).map(function(r){return '<span class="badge badge-'+(r.status==='present'?'success':r.status==='absent'?'danger':'warning')+'" style="margin:3px;">'+r.date+': '+r.status+'</span>';}).join('');
+    }
+    function loadSResults() {
+      if(!student) return;
+      var results = getStudentResults(student.id);
+      document.getElementById('s-result-body').innerHTML = results.length ?
+        '<div class="table-responsive"><table class="data-table"><thead><tr><th>Exam</th><th>Subject</th><th>Marks</th><th>%</th><th>Grade</th></tr></thead><tbody>'+
+        results.map(function(r){return '<tr><td>'+escapeHtml(r.examName)+'</td><td>'+escapeHtml(r.subject)+'</td><td>'+r.obtainedMarks+'/'+r.totalMarks+'</td><td>'+r.percentage+'%</td><td>'+r.grade+'</td></tr>';}).join('')+'</tbody></table></div>' : '<p>No results yet</p>';
+    }
+    document.addEventListener('DOMContentLoaded', loadSDash);
+  </script>
+</body>
+</html>

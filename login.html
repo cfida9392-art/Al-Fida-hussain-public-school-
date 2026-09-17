@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | AL FIDA HUSSAIN PUBLIC SCHOOLS</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <img src="assets/logo.png" alt="Logo" class="logo">
+      <h1>AL FIDA HUSSAIN PUBLIC SCHOOLS</h1>
+      <p class="tagline">Quality Education, Bright Future</p>
+      
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Username</label>
+          <input type="text" id="username" class="form-control" required placeholder="Enter username" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="password" class="form-control" required placeholder="Enter password" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
+      </form>
+
+      <div id="login-error" style="display:none;margin-top:12px;padding:10px;background:#fee2e2;color:#991b1b;border-radius:6px;font-size:0.9rem;"></div>
+
+      <div class="demo-credentials">
+        <strong>Demo Credentials:</strong><br>
+        Admin: <code>admin</code> / <code>admin123</code><br>
+        Teacher: <code>teacher</code> / <code>teacher123</code><br>
+        Accountant: <code>accountant</code> / <code>accountant123</code><br>
+        Parent: <code>parent</code> / <code>parent123</code><br>
+        Student: <code>student</code> / <code>student123</code>
+      </div>
+
+      <p style="margin-top:20px;font-size:0.85rem;">
+        <a href="index.html" style="color:var(--navy);"><i class="fas fa-arrow-left"></i> Back to Website</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Redirect if already logged in
+    const session = getSession();
+    if (session) {
+      redirectToDashboard(session.role);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const result = login(username, password);
+      const errEl = document.getElementById('login-error');
+      if (result.success) {
+        errEl.style.display = 'none';
+        showToast('Login successful! Redirecting...', 'success');
+        setTimeout(() => redirectToDashboard(result.user.role), 800);
+      } else {
+        errEl.textContent = result.message;
+        errEl.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
