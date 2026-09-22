@@ -111,6 +111,7 @@ function getDefaultSettings() {
     address: 'Pakistan',
     academicSession: '2025-2026',
     logo: 'assets/logo.png',
+    adminProfilePhoto: '',
     currency: 'PKR',
     gradeSystem: [
       { min: 90, grade: 'A+', remark: 'Outstanding' },

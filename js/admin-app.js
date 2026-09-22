@@ -399,7 +399,7 @@ function generateIDCard() {
   var s = getStudentById(id); if(!s) return;
   var settings = getSettings();
   document.getElementById('idcard-preview').innerHTML =
-    '<div class="id-card"><div class="id-card-header"><img src="assets/logo.png" alt="Logo"><h4>'+settings.schoolName+'</h4></div>'+
+    '<div class="id-card"><div class="id-card-header"><img src="'+getLogoSrc()+'" alt="Logo"><h4>'+settings.schoolName+'</h4></div>'+
     '<div class="id-card-body"><div class="photo"><i class="fas fa-user"></i></div><h3>'+escapeHtml(s.name)+'</h3>'+
     '<p>ID: '+s.id+'</p><p>Class: '+escapeHtml(s.className)+' - '+escapeHtml(s.section)+'</p><p>Roll: '+(s.rollNo||'-')+'</p>'+
     '<p style="font-size:0.75rem;margin-top:8px;">Father: '+escapeHtml(s.fatherName)+'</p></div>'+
@@ -419,7 +419,7 @@ function generateCertificate() {
   var text = type==='character'?'He/She bears a good moral character.':type==='leaving'?'He/She is leaving the school with our best wishes.':'He/She has actively participated / achieved excellence.';
   document.getElementById('certificate-preview').innerHTML =
     '<div style="max-width:700px;margin:0 auto;padding:40px;border:4px double #c9a227;text-align:center;font-family:serif;">'+
-    '<img src="assets/logo.png" style="width:80px;height:80px;border-radius:50%;border:2px solid #c9a227;">'+
+    '<img src="'+getLogoSrc()+'" style="width:80px;height:80px;border-radius:50%;border:2px solid #c9a227;">'+
     '<h2 style="color:#1e3a5f;margin:12px 0 4px;">'+settings.schoolName+'</h2>'+
     '<p style="color:#c9a227;font-weight:600;">'+settings.tagline+'</p>'+
     '<h1 style="margin:30px 0;color:#1e3a5f;font-size:1.8rem;border-bottom:2px solid #c9a227;display:inline-block;padding-bottom:8px;">'+titles[type]+'</h1>'+
@@ -459,4 +459,5 @@ function globalSearch(term) {
 document.addEventListener('DOMContentLoaded', function() {
   loadDashboard();
   updateNotifBadge();
+  if (typeof applyBranding === 'function') applyBranding();
 });

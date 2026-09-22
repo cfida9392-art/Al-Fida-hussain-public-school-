@@ -113,7 +113,7 @@ function generateFeeReceiptHTML(fee) {
   return `
     <div id="fee-receipt-print" style="max-width:700px;margin:0 auto;padding:30px;font-family:Arial,sans-serif;border:2px solid #1e3a5f;">
       <div style="text-align:center;border-bottom:2px solid #c9a227;padding-bottom:16px;margin-bottom:20px;">
-        <img src="assets/logo.png" style="width:70px;height:70px;border-radius:50%;border:2px solid #c9a227;">
+        <img src="' + (typeof getLogoSrc === 'function' ? getLogoSrc() : 'assets/logo.png') + '" style="width:70px;height:70px;border-radius:50%;border:2px solid #c9a227;">
         <h2 style="color:#1e3a5f;margin:8px 0 4px;">${settings.schoolName}</h2>
         <p style="color:#c9a227;font-weight:600;margin:0;">${settings.tagline}</p>
         <p style="margin:4px 0;font-size:0.9rem;">Fee Receipt</p>
