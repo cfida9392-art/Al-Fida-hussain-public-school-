@@ -15,7 +15,7 @@
     <div class="sidebar-overlay" onclick="closeSidebar()"></div>
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <img src="assets/logo.png" alt="Logo">
+        <img src="assets/logo.png" alt="Logo" class="brand-logo">
         <div class="info">
           <h2>AL FIDA HUSSAIN PUBLIC SCHOOLS</h2>
           <span>Admin Panel</span>
@@ -434,6 +434,34 @@
           <div class="content-card">
             <div class="content-card-header"><h3>Settings</h3></div>
             <div class="content-card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+                <div class="form-group" style="text-align:center;">
+                  <label style="display:block;margin-bottom:10px;font-weight:600;">School Logo</label>
+                  <div style="width:120px;height:120px;margin:0 auto 12px;border-radius:50%;border:3px solid var(--gold);overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;">
+                    <img id="setting-logo-preview" src="assets/logo.png" alt="Logo" style="width:100%;height:100%;object-fit:cover;">
+                  </div>
+                  <input type="file" id="setting-logo-input" accept="image/*" style="display:none;" onchange="changeLogo(this)">
+                  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('setting-logo-input').click()"><i class="fas fa-upload"></i> Change Logo</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeLogo()"><i class="fas fa-trash"></i> Remove</button>
+                  </div>
+                  <small style="display:block;margin-top:8px;color:var(--gray-500);">JPG/PNG, max 1.5 MB</small>
+                </div>
+                <div class="form-group" style="text-align:center;">
+                  <label style="display:block;margin-bottom:10px;font-weight:600;">Admin Profile Picture</label>
+                  <div style="width:120px;height:120px;margin:0 auto 12px;border-radius:50%;border:3px solid var(--navy);overflow:hidden;background:var(--gold);display:flex;align-items:center;justify-content:center;position:relative;">
+                    <img id="setting-profile-preview" src="" alt="Profile" style="width:100%;height:100%;object-fit:cover;display:none;">
+                    <div id="setting-profile-placeholder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:var(--navy);">A</div>
+                  </div>
+                  <input type="file" id="setting-profile-input" accept="image/*" style="display:none;" onchange="changeAdminProfile(this)">
+                  <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('setting-profile-input').click()"><i class="fas fa-camera"></i> Change Photo</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeAdminProfile()"><i class="fas fa-trash"></i> Remove</button>
+                  </div>
+                  <small style="display:block;margin-top:8px;color:var(--gray-500);">JPG/PNG, max 1 MB</small>
+                </div>
+              </div>
+              <hr style="margin:0 0 20px;border-color:var(--gray-200);">
               <div class="form-group"><label>School Name</label><input type="text" class="form-control" id="setting-schoolName"></div>
               <div class="form-group"><label>Tagline</label><input type="text" class="form-control" id="setting-tagline"></div>
               <div class="form-group"><label>WhatsApp</label><input type="text" class="form-control" id="setting-whatsapp"></div>
