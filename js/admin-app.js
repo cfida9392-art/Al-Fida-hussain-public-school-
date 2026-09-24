@@ -390,20 +390,103 @@ function loadPayroll() {
     payroll.map(function(p){return '<tr><td>'+escapeHtml(p.teacherName)+'</td><td>'+escapeHtml(p.month)+'</td><td>'+formatCurrency(p.basicSalary)+'</td><td>'+formatCurrency(p.bonus)+'</td><td>'+formatCurrency(p.deduction)+'</td><td><strong>'+formatCurrency(p.netSalary)+'</strong></td><td><span class="badge badge-success">'+p.status+'</span></td></tr>';}).join('')+'</tbody></table></div>';
 }
 
-function initIDCards() {
+function initIDCards(preselectId) {
   var students = getAllStudents().filter(function(s){return s.status==='active';});
-  document.getElementById('idcard-student').innerHTML = '<option value="">Select Student</option>'+students.map(function(s){return '<option value="'+s.id+'">'+s.name+' ('+s.className+')</option>';}).join('');
+  var sel = document.getElementById('idcard-student');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select Student</option>'+students.map(function(s){return '<option value="'+s.id+'">'+s.name+' ('+s.className+')</option>';}).join('');
+  if (preselectId) {
+    sel.value = preselectId;
+    generateIDCard();
+  }
+}
+function openStudentIDCard(studentId) {
+  showPage('idcards');
+  setTimeout(function(){ initIDCards(studentId); }, 50);
 }
 function generateIDCard() {
-  var id = document.getElementById('idcard-student').value; if(!id) return;
-  var s = getStudentById(id); if(!s) return;
+  var id = document.getElementById('idcard-student').value;
+  if (!id) {
+    document.getElementById('idcard-preview').innerHTML = '<div class="empty-state"><i class="fas fa-id-card"></i><p>Select a student to generate ID card</p></div>';
+    return;
+  }
+  var s = getStudentById(id); if (!s) return;
   var settings = getSettings();
-  document.getElementById('idcard-preview').innerHTML =
-    '<div class="id-card"><div class="id-card-header"><img src="'+getLogoSrc()+'" alt="Logo"><h4>'+settings.schoolName+'</h4></div>'+
-    '<div class="id-card-body"><div class="photo"><i class="fas fa-user"></i></div><h3>'+escapeHtml(s.name)+'</h3>'+
-    '<p>ID: '+s.id+'</p><p>Class: '+escapeHtml(s.className)+' - '+escapeHtml(s.section)+'</p><p>Roll: '+(s.rollNo||'-')+'</p>'+
-    '<p style="font-size:0.75rem;margin-top:8px;">Father: '+escapeHtml(s.fatherName)+'</p></div>'+
-    '<div class="id-card-footer">'+settings.tagline+' | WhatsApp: '+settings.whatsapp+'</div></div>';
+  var logo = (typeof getLogoSrc === 'function') ? getLogoSrc() : 'assets/logo.png';
+  var photoHtml = s.photo
+    ? '<img src="'+s.photo+'" alt="Photo">'
+    : '<div class="ph-icon"><i class="fas fa-user"></i></div>';
+  var session = settings.academicSession || '2025-2026';
+
+  // QR code data: student verification payload (readable when scanned)
+  var qrPayload = [
+    'AL FIDA HUSSAIN PUBLIC SCHOOLS',
+    'STUDENT ID CARD',
+    'ID: ' + (s.id || ''),
+    'Name: ' + (s.name || ''),
+    'Father: ' + (s.fatherName || ''),
+    'Class: ' + (s.className || '') + '-' + (s.section || ''),
+    'Roll: ' + (s.rollNo || ''),
+    'Session: ' + session,
+    'WhatsApp: ' + (settings.whatsapp || '03168122916')
+  ].join('\n');
+  var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=4&data=' + encodeURIComponent(qrPayload);
+
+  var html = ''
+    + '<div class="id-card-wrap">'
+    +   '<div>'
+    +     '<div class="id-card-side-label">Front</div>'
+    +     '<div class="id-card">'
+    +       '<div class="id-card-top">'
+    +         '<img src="'+logo+'" alt="Logo">'
+    +         '<div class="school-meta">'
+    +           '<h2>'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</h2>'
+    +           '<p>'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</p>'
+    +         '</div>'
+    +       '</div>'
+    +       '<div class="id-card-banner">Student Identification Card</div>'
+    +       '<div class="id-card-photo-row">'
+    +         '<div class="id-card-photo">'+photoHtml+'</div>'
+    +         '<div class="id-card-qr">'
+    +           '<img src="'+qrUrl+'" alt="QR Code" title="Scan to verify student">'
+    +           '<span>Scan QR</span>'
+    +         '</div>'
+    +       '</div>'
+    +       '<div class="id-card-details">'
+    +         '<div class="row"><span class="label">Name</span><span class="value">: '+escapeHtml(s.name)+'</span></div>'
+    +         '<div class="row"><span class="label">Father Name</span><span class="value">: '+escapeHtml(s.fatherName || '-')+'</span></div>'
+    +         '<div class="row"><span class="label">Student ID</span><span class="value">: '+escapeHtml(s.id)+'</span></div>'
+    +         '<div class="row"><span class="label">Class</span><span class="value">: '+escapeHtml(s.className)+' - '+escapeHtml(s.section || '')+'</span></div>'
+    +         '<div class="row"><span class="label">Roll No</span><span class="value">: '+(s.rollNo || '-')+'</span></div>'
+    +         '<div class="row"><span class="label">Session</span><span class="value">: '+escapeHtml(session)+'</span></div>'
+    +         '<div class="row"><span class="label">Contact</span><span class="value">: '+escapeHtml(s.parentWhatsApp || s.fatherPhone || s.phone || '-')+'</span></div>'
+    +       '</div>'
+    +       '<div class="id-card-wave"></div>'
+    +       '<div class="id-card-footer-bar">'
+    +         '<div class="sig"><div class="line">____________</div><span>Principal Signature</span></div>'
+    +         '<div class="sig"><div class="line">____________</div><span>Administrator Signature</span></div>'
+    +       '</div>'
+    +     '</div>'
+    +   '</div>'
+    +   '<div>'
+    +     '<div class="id-card-side-label">Back</div>'
+    +     '<div class="id-card back">'
+    +       '<img class="id-card-back-logo" src="'+logo+'" alt="Logo">'
+    +       '<div class="id-card-back-title">'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</div>'
+    +       '<div class="id-card-back-tag">'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</div>'
+    +       '<img class="id-card-back-qr" src="'+qrUrl+'" alt="QR Code">'
+    +       '<div class="id-card-back-info">'
+    +         '<strong>Scan QR to verify student</strong><br>'
+    +         'If found, please return to school<br>'
+    +         'WhatsApp / Phone: '+escapeHtml(settings.whatsapp || '03168122916')+'<br>'
+    +         escapeHtml(settings.email || 'info@alfidahussain.edu.pk')+'<br>'
+    +         escapeHtml(settings.address || 'Pakistan')+'<br><br>'
+    +         '<em>This card is property of the school.<br>Misuse is strictly prohibited.</em>'
+    +       '</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+  document.getElementById('idcard-preview').innerHTML = html;
 }
 
 function initCertificates() {

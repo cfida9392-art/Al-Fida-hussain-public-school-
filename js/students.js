@@ -108,6 +108,7 @@ function renderStudentsTable(containerId, options = {}) {
         <td class="actions">
           <button class="btn btn-sm btn-primary" onclick="viewStudent('${s.id}')" title="View"><i class="fas fa-eye"></i></button>
           <button class="btn btn-sm" style="background:var(--gray-200);" onclick="editStudent('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm" style="background:#1e3a5f;color:#fff;" onclick="openStudentIDCard('${s.id}')" title="ID Card"><i class="fas fa-id-card"></i></button>
           ${s.parentWhatsApp ? `<button class="btn btn-sm btn-whatsapp" onclick="openWhatsApp('${s.parentWhatsApp}','Assalam-o-Alaikum. This is a message from AL FIDA HUSSAIN PUBLIC SCHOOLS regarding ${s.name}.')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>` : ''}
           <button class="btn btn-sm btn-danger" onclick="confirmDeleteStudent('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button>
         </td>
