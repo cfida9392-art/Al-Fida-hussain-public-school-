@@ -139,11 +139,49 @@ function populateClassSelects() {
 function openAddStudentModal() {
   document.getElementById('student-modal-title').textContent = 'Add Student';
   document.getElementById('student-edit-id').value = '';
+  document.getElementById('stu-photo-data').value = '';
   ['stu-name','stu-father','stu-mother','stu-dob','stu-phone','stu-father-phone','stu-whatsapp','stu-address','stu-prev-school','stu-roll'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value='';
   });
+  setStudentPhotoPreview('');
   populateClassSelects();
   openModal('modal-student');
+}
+
+function setStudentPhotoPreview(dataUrl) {
+  var img = document.getElementById('stu-photo-preview');
+  var ph = document.getElementById('stu-photo-placeholder');
+  var hidden = document.getElementById('stu-photo-data');
+  if (hidden) hidden.value = dataUrl || '';
+  if (!img || !ph) return;
+  if (dataUrl) {
+    img.src = dataUrl;
+    img.style.display = 'block';
+    ph.style.display = 'none';
+  } else {
+    img.src = '';
+    img.style.display = 'none';
+    ph.style.display = 'block';
+  }
+}
+
+function onStudentPhotoSelect(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please select an image','error'); return; }
+  if (file.size > 1024 * 1024) { showToast('Photo max 1 MB','error'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    setStudentPhotoPreview(e.target.result);
+    showToast('Photo selected — Save to apply');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function removeStudentPhoto() {
+  setStudentPhotoPreview('');
+  showToast('Photo removed');
 }
 
 function editStudent(id) {
@@ -166,6 +204,7 @@ function editStudent(id) {
   document.getElementById('stu-address').value = s.address||'';
   document.getElementById('stu-prev-school').value = s.previousSchool||'';
   document.getElementById('stu-status').value = s.status||'active';
+  setStudentPhotoPreview(s.photo || '');
   openModal('modal-student');
 }
 
@@ -185,7 +224,8 @@ function saveStudent() {
     parentWhatsApp: document.getElementById('stu-whatsapp').value.trim(),
     address: document.getElementById('stu-address').value.trim(),
     previousSchool: document.getElementById('stu-prev-school').value.trim(),
-    status: document.getElementById('stu-status').value
+    status: document.getElementById('stu-status').value,
+    photo: document.getElementById('stu-photo-data').value || ''
   };
   if (!data.name || !data.fatherName || !data.className) { showToast('Please fill required fields','error'); return; }
   if (id) { updateStudent(id, data); showToast('Student updated'); }
@@ -487,6 +527,29 @@ function generateIDCard() {
     +   '</div>'
     + '</div>';
   document.getElementById('idcard-preview').innerHTML = html;
+}
+
+
+function triggerIDCardPhotoUpload() {
+  var id = document.getElementById('idcard-student').value;
+  if (!id) { showToast('Pehle student select karein','warning'); return; }
+  document.getElementById('idcard-photo-input').click();
+}
+function uploadIDCardPhoto(input) {
+  var id = document.getElementById('idcard-student').value;
+  if (!id) { showToast('Student select karein','error'); return; }
+  var file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Image select karein','error'); return; }
+  if (file.size > 1024 * 1024) { showToast('Photo max 1 MB','error'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    updateStudent(id, { photo: e.target.result });
+    showToast('Photo added on ID card');
+    generateIDCard();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
 }
 
 function initCertificates() {
