@@ -366,6 +366,8 @@
               <div class="filters-bar no-print">
                 <select class="form-control" id="idcard-student" onchange="generateIDCard()"><option value="">Select Student</option></select>
                 <button class="btn btn-sm btn-primary" onclick="generateIDCard()"><i class="fas fa-sync"></i> Generate</button>
+                <input type="file" id="idcard-photo-input" accept="image/*" style="display:none;" onchange="uploadIDCardPhoto(this)">
+                <button class="btn btn-sm" style="background:#1e3a5f;color:#fff;" onclick="triggerIDCardPhotoUpload()"><i class="fas fa-camera"></i> Add Photo</button>
                 <button class="btn btn-sm btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print ID Card</button>
               </div>
               <div id="idcard-preview">
@@ -500,6 +502,20 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="student-edit-id">
+        <input type="hidden" id="stu-photo-data">
+        <div style="text-align:center;margin-bottom:18px;">
+          <label style="display:block;font-weight:600;margin-bottom:8px;">Student Photo (ID Card)</label>
+          <div id="stu-photo-box" style="width:100px;height:120px;margin:0 auto 10px;border:2px solid var(--navy);border-radius:6px;overflow:hidden;background:#f3f4f6;display:flex;align-items:center;justify-content:center;">
+            <img id="stu-photo-preview" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <i id="stu-photo-placeholder" class="fas fa-user" style="font-size:2.5rem;color:#9ca3af;"></i>
+          </div>
+          <input type="file" id="stu-photo-input" accept="image/*" style="display:none;" onchange="onStudentPhotoSelect(this)">
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('stu-photo-input').click()"><i class="fas fa-camera"></i> Add / Change Photo</button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeStudentPhoto()"><i class="fas fa-trash"></i> Remove</button>
+          </div>
+          <small style="display:block;margin-top:6px;color:var(--gray-500);">JPG/PNG, max 1 MB — ID card ke liye</small>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div class="form-group"><label>Student Name *</label><input type="text" class="form-control" id="stu-name"></div>
           <div class="form-group"><label>Father Name *</label><input type="text" class="form-control" id="stu-father"></div>
