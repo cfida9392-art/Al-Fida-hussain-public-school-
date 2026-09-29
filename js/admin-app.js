@@ -430,35 +430,138 @@ function loadPayroll() {
     payroll.map(function(p){return '<tr><td>'+escapeHtml(p.teacherName)+'</td><td>'+escapeHtml(p.month)+'</td><td>'+formatCurrency(p.basicSalary)+'</td><td>'+formatCurrency(p.bonus)+'</td><td>'+formatCurrency(p.deduction)+'</td><td><strong>'+formatCurrency(p.netSalary)+'</strong></td><td><span class="badge badge-success">'+p.status+'</span></td></tr>';}).join('')+'</tbody></table></div>';
 }
 
-function initIDCards(preselectId) {
-  var students = getAllStudents().filter(function(s){return s.status==='active';});
-  var sel = document.getElementById('idcard-student');
+function initIDCards(preselectId, preselectType) {
+  var typeEl = document.getElementById('idcard-type');
+  if (preselectType && typeEl) typeEl.value = preselectType;
+  onIDCardTypeChange(preselectId);
+}
+
+function onIDCardTypeChange(preselectId) {
+  var type = (document.getElementById('idcard-type') || {}).value || 'student';
+  var sel = document.getElementById('idcard-person');
   if (!sel) return;
-  sel.innerHTML = '<option value="">Select Student</option>'+students.map(function(s){return '<option value="'+s.id+'">'+s.name+' ('+s.className+')</option>';}).join('');
+  if (type === 'teacher') {
+    var teachers = getAllTeachers().filter(function(t){ return t.status === 'active'; });
+    sel.innerHTML = '<option value="">Select Teacher</option>' + teachers.map(function(t){
+      return '<option value="'+t.id+'">'+escapeHtml(t.name)+'</option>';
+    }).join('');
+  } else {
+    var students = getAllStudents().filter(function(s){ return s.status === 'active'; });
+    sel.innerHTML = '<option value="">Select Student</option>' + students.map(function(s){
+      return '<option value="'+s.id+'">'+escapeHtml(s.name)+' ('+escapeHtml(s.className)+')</option>';
+    }).join('');
+  }
   if (preselectId) {
     sel.value = preselectId;
     generateIDCard();
+  } else {
+    document.getElementById('idcard-preview').innerHTML = '<div class="empty-state"><i class="fas fa-id-card"></i><p>Select '+ (type==='teacher'?'Teacher':'Student') +' to generate ID card</p></div>';
   }
 }
+
 function openStudentIDCard(studentId) {
   showPage('idcards');
-  setTimeout(function(){ initIDCards(studentId); }, 50);
+  setTimeout(function(){ initIDCards(studentId, 'student'); }, 50);
 }
+
+function openTeacherIDCard(teacherId) {
+  showPage('idcards');
+  setTimeout(function(){ initIDCards(teacherId, 'teacher'); }, 50);
+}
+
 function generateIDCard() {
-  var id = document.getElementById('idcard-student').value;
+  var type = (document.getElementById('idcard-type') || {}).value || 'student';
+  var id = (document.getElementById('idcard-person') || {}).value;
   if (!id) {
-    document.getElementById('idcard-preview').innerHTML = '<div class="empty-state"><i class="fas fa-id-card"></i><p>Select a student to generate ID card</p></div>';
+    document.getElementById('idcard-preview').innerHTML = '<div class="empty-state"><i class="fas fa-id-card"></i><p>Select a person to generate ID card</p></div>';
     return;
   }
-  var s = getStudentById(id); if (!s) return;
   var settings = getSettings();
   var logo = (typeof getLogoSrc === 'function') ? getLogoSrc() : 'assets/logo.png';
+  var session = settings.academicSession || '2025-2026';
+
+  if (type === 'teacher') {
+    var t = getTeacherById(id);
+    if (!t) return;
+    var photoHtml = t.photo
+      ? '<img src="'+t.photo+'" alt="Photo">'
+      : '<div class="ph-icon"><i class="fas fa-user-tie"></i></div>';
+    var subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
+    var classes = Array.isArray(t.classes) ? t.classes.join(', ') : (t.classes || '-');
+    var qrPayload = [
+      'AL FIDA HUSSAIN PUBLIC SCHOOLS',
+      'TEACHER ID CARD',
+      'ID: ' + (t.id || ''),
+      'Name: ' + (t.name || ''),
+      'Subjects: ' + subjects,
+      'Phone: ' + (t.phone || ''),
+      'Session: ' + session,
+      'WhatsApp: ' + (settings.whatsapp || '03168122916')
+    ].join('\n');
+    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=4&data=' + encodeURIComponent(qrPayload);
+    var html = ''
+      + '<div class="id-card-wrap">'
+      +   '<div>'
+      +     '<div class="id-card-side-label">Front</div>'
+      +     '<div class="id-card">'
+      +       '<div class="id-card-top">'
+      +         '<img src="'+logo+'" alt="Logo">'
+      +         '<div class="school-meta">'
+      +           '<h2>'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</h2>'
+      +           '<p>'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</p>'
+      +         '</div>'
+      +       '</div>'
+      +       '<div class="id-card-banner">Teacher Identification Card</div>'
+      +       '<div class="id-card-photo-row">'
+      +         '<div class="id-card-photo">'+photoHtml+'</div>'
+      +         '<div class="id-card-qr">'
+      +           '<img src="'+qrUrl+'" alt="QR Code" title="Scan to verify">'
+      +           '<span>Scan QR</span>'
+      +         '</div>'
+      +       '</div>'
+      +       '<div class="id-card-details">'
+      +         '<div class="row"><span class="label">Name</span><span class="value">: '+escapeHtml(t.name)+'</span></div>'
+      +         '<div class="row"><span class="label">Teacher ID</span><span class="value">: '+escapeHtml(t.id)+'</span></div>'
+      +         '<div class="row"><span class="label">Subjects</span><span class="value">: '+escapeHtml(subjects)+'</span></div>'
+      +         '<div class="row"><span class="label">Classes</span><span class="value">: '+escapeHtml(classes)+'</span></div>'
+      +         '<div class="row"><span class="label">Qualification</span><span class="value">: '+escapeHtml(t.qualification || '-')+'</span></div>'
+      +         '<div class="row"><span class="label">Phone</span><span class="value">: '+escapeHtml(t.phone || '-')+'</span></div>'
+      +         '<div class="row"><span class="label">Session</span><span class="value">: '+escapeHtml(session)+'</span></div>'
+      +       '</div>'
+      +       '<div class="id-card-wave"></div>'
+      +       '<div class="id-card-footer-bar">'
+      +         '<div class="sig"><div class="line">____________</div><span>Principal Signature</span></div>'
+      +         '<div class="sig"><div class="line">____________</div><span>Administrator Signature</span></div>'
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div>'
+      +     '<div class="id-card-side-label">Back</div>'
+      +     '<div class="id-card back">'
+      +       '<img class="id-card-back-logo" src="'+logo+'" alt="Logo">'
+      +       '<div class="id-card-back-title">'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</div>'
+      +       '<div class="id-card-back-tag">'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</div>'
+      +       '<img class="id-card-back-qr" src="'+qrUrl+'" alt="QR Code">'
+      +       '<div class="id-card-back-info">'
+      +         '<strong>Staff / Teacher ID Card</strong><br>'
+      +         'Scan QR to verify teacher<br>'
+      +         'WhatsApp / Phone: '+escapeHtml(settings.whatsapp || '03168122916')+'<br>'
+      +         escapeHtml(settings.email || 'info@alfidahussain.edu.pk')+'<br>'
+      +         escapeHtml(settings.address || 'Pakistan')+'<br><br>'
+      +         '<em>This card is property of the school.<br>Misuse is strictly prohibited.</em>'
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+    document.getElementById('idcard-preview').innerHTML = html;
+    return;
+  }
+
+  // Student ID card
+  var s = getStudentById(id); if (!s) return;
   var photoHtml = s.photo
     ? '<img src="'+s.photo+'" alt="Photo">'
     : '<div class="ph-icon"><i class="fas fa-user"></i></div>';
-  var session = settings.academicSession || '2025-2026';
-
-  // QR code data: student verification payload (readable when scanned)
   var qrPayload = [
     'AL FIDA HUSSAIN PUBLIC SCHOOLS',
     'STUDENT ID CARD',
@@ -471,7 +574,6 @@ function generateIDCard() {
     'WhatsApp: ' + (settings.whatsapp || '03168122916')
   ].join('\n');
   var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=4&data=' + encodeURIComponent(qrPayload);
-
   var html = ''
     + '<div class="id-card-wrap">'
     +   '<div>'
@@ -529,22 +631,26 @@ function generateIDCard() {
   document.getElementById('idcard-preview').innerHTML = html;
 }
 
-
 function triggerIDCardPhotoUpload() {
-  var id = document.getElementById('idcard-student').value;
-  if (!id) { showToast('Pehle student select karein','warning'); return; }
+  var id = (document.getElementById('idcard-person') || {}).value;
+  if (!id) { showToast('Pehle Student / Teacher select karein','warning'); return; }
   document.getElementById('idcard-photo-input').click();
 }
 function uploadIDCardPhoto(input) {
-  var id = document.getElementById('idcard-student').value;
-  if (!id) { showToast('Student select karein','error'); return; }
+  var type = (document.getElementById('idcard-type') || {}).value || 'student';
+  var id = (document.getElementById('idcard-person') || {}).value;
+  if (!id) { showToast('Pehle select karein','error'); return; }
   var file = input.files && input.files[0];
   if (!file) return;
   if (!file.type.startsWith('image/')) { showToast('Image select karein','error'); return; }
   if (file.size > 1024 * 1024) { showToast('Photo max 1 MB','error'); return; }
   var reader = new FileReader();
   reader.onload = function(e) {
-    updateStudent(id, { photo: e.target.result });
+    if (type === 'teacher') {
+      updateTeacher(id, { photo: e.target.result });
+    } else {
+      updateStudent(id, { photo: e.target.result });
+    }
     showToast('Photo added on ID card');
     generateIDCard();
   };

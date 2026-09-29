@@ -28,6 +28,7 @@ function renderTeachersTable(containerId, search = '') {
       <td><span class="badge badge-${t.status === 'active' ? 'success' : 'secondary'}">${t.status}</span></td>
       <td class="actions">
         <button class="btn btn-sm" style="background:var(--gray-200);" onclick="editTeacher('${t.id}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm" style="background:#1e3a5f;color:#fff;" onclick="openTeacherIDCard('${t.id}')" title="ID Card"><i class="fas fa-id-card"></i></button>
         ${t.whatsapp ? `<button class="btn btn-sm btn-whatsapp" onclick="openWhatsApp('${t.whatsapp}','Assalam-o-Alaikum. Message from AL FIDA HUSSAIN PUBLIC SCHOOLS.')"><i class="fab fa-whatsapp"></i></button>` : ''}
         <button class="btn btn-sm btn-danger" onclick="if(confirmAction('Delete this teacher?')){deleteTeacher('${t.id}');loadTeachers();showToast('Deleted');}"><i class="fas fa-trash"></i></button>
       </td>
