@@ -360,18 +360,22 @@
         <div id="page-idcards" class="page-section" style="display:none;">
           <div class="content-card">
             <div class="content-card-header">
-              <h3><i class="fas fa-id-card"></i> Student ID Cards</h3>
+              <h3><i class="fas fa-id-card"></i> ID Cards (Student / Teacher)</h3>
             </div>
             <div class="content-card-body">
               <div class="filters-bar no-print">
-                <select class="form-control" id="idcard-student" onchange="generateIDCard()"><option value="">Select Student</option></select>
+                <select class="form-control" id="idcard-type" onchange="onIDCardTypeChange()">
+                  <option value="student">Student</option>
+                  <option value="teacher">Teacher</option>
+                </select>
+                <select class="form-control" id="idcard-person" onchange="generateIDCard()"><option value="">Select...</option></select>
                 <button class="btn btn-sm btn-primary" onclick="generateIDCard()"><i class="fas fa-sync"></i> Generate</button>
                 <input type="file" id="idcard-photo-input" accept="image/*" style="display:none;" onchange="uploadIDCardPhoto(this)">
                 <button class="btn btn-sm" style="background:#1e3a5f;color:#fff;" onclick="triggerIDCardPhotoUpload()"><i class="fas fa-camera"></i> Add Photo</button>
                 <button class="btn btn-sm btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print ID Card</button>
               </div>
               <div id="idcard-preview">
-                <div class="empty-state"><i class="fas fa-id-card"></i><p>Select a student to generate professional ID card</p></div>
+                <div class="empty-state"><i class="fas fa-id-card"></i><p>Select Student or Teacher to generate ID card</p></div>
               </div>
             </div>
           </div>
