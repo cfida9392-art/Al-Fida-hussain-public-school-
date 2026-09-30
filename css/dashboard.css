@@ -825,6 +825,258 @@
   letter-spacing: 1px;
 }
 
+
+
+/* Modern Teacher ID Card (sample style) */
+.tid-card {
+  width: 340px;
+  height: 540px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  position: relative;
+  font-family: 'Inter', Arial, sans-serif;
+  background: #fff;
+}
+.tid-card.front {
+  display: flex;
+  flex-direction: column;
+}
+.tid-top {
+  background: #0f2744;
+  height: 200px;
+  position: relative;
+  text-align: center;
+  padding-top: 18px;
+}
+.tid-top::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 70px;
+  background: #fff;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+.tid-top .wave-green {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 28px;
+  height: 50px;
+  background: #8bc34a;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  z-index: 1;
+}
+.tid-school-name {
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 2;
+  padding: 0 16px;
+  line-height: 1.25;
+}
+.tid-tagline {
+  color: #8bc34a;
+  font-size: 0.68rem;
+  font-weight: 600;
+  margin-top: 3px;
+  position: relative;
+  z-index: 2;
+}
+.tid-logo-ring {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 4px solid #8bc34a;
+  background: #fff;
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  z-index: 3;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tid-logo-ring img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.tid-body {
+  flex: 1;
+  padding: 48px 22px 16px;
+  text-align: center;
+}
+.tid-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 2px;
+}
+.tid-role {
+  color: #8bc34a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.tid-info {
+  text-align: left;
+  font-size: 0.8rem;
+  color: #333;
+  max-width: 260px;
+  margin: 0 auto;
+}
+.tid-info .row {
+  display: flex;
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+.tid-info .lab {
+  width: 95px;
+  color: #555;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.tid-info .val {
+  font-weight: 700;
+  color: #111;
+}
+.tid-bottom {
+  background: #0f2744;
+  height: 48px;
+  position: relative;
+}
+.tid-bottom::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 28px;
+  background: #8bc34a;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+/* Back */
+.tid-card.back {
+  display: flex;
+  flex-direction: column;
+}
+.tid-back-top {
+  background: #0f2744;
+  padding: 22px 20px 50px;
+  color: #fff;
+  position: relative;
+  min-height: 200px;
+}
+.tid-back-top::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 55px;
+  background: #fff;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+.tid-back-top .wave-green {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 20px;
+  height: 42px;
+  background: #8bc34a;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  z-index: 1;
+}
+.tid-back-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.tid-back-terms {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.45;
+  position: relative;
+  z-index: 2;
+  padding: 0 8px;
+}
+.tid-back-dates {
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 12px;
+  position: relative;
+  z-index: 2;
+  line-height: 1.6;
+}
+.tid-back-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px 12px;
+  text-align: center;
+}
+.tid-back-sig {
+  font-family: cursive;
+  font-size: 1.15rem;
+  color: #0f2744;
+  margin-bottom: 2px;
+}
+.tid-back-sig-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #333;
+}
+.tid-back-sig-role {
+  font-size: 0.68rem;
+  color: #777;
+  margin-bottom: 12px;
+}
+.tid-back-qr {
+  width: 100px;
+  height: 100px;
+  border: 2px solid #0f2744;
+  border-radius: 8px;
+  padding: 4px;
+  background: #fff;
+  margin-bottom: 10px;
+}
+.tid-back-school {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f2744;
+}
+.tid-back-tag {
+  font-size: 0.7rem;
+  color: #8bc34a;
+  font-weight: 600;
+}
+.tid-back-bottom {
+  background: #0f2744;
+  height: 42px;
+  position: relative;
+}
+.tid-back-bottom::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: -1px;
+  height: 24px;
+  background: #8bc34a;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+@media print {
+  .tid-card { box-shadow: none; break-inside: avoid; }
+}
+
 @media print {
   .id-card-wrap { gap: 16px; }
   .id-card { box-shadow: none; break-inside: avoid; }
