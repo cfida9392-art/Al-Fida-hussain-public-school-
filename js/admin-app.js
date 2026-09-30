@@ -483,11 +483,13 @@ function generateIDCard() {
   if (type === 'teacher') {
     var t = getTeacherById(id);
     if (!t) return;
-    var photoHtml = t.photo
-      ? '<img src="'+t.photo+'" alt="Photo">'
-      : '<div class="ph-icon"><i class="fas fa-user-tie"></i></div>';
+    var photoSrc = t.photo || '';
+    var photoHtml = photoSrc
+      ? '<img src="'+photoSrc+'" alt="Photo">'
+      : '<i class="fas fa-user-tie" style="font-size:2.2rem;color:#9ca3af;"></i>';
     var subjects = Array.isArray(t.subjects) ? t.subjects.join(', ') : (t.subjects || '-');
     var classes = Array.isArray(t.classes) ? t.classes.join(', ') : (t.classes || '-');
+    var joinDate = t.joiningDate ? formatDate(t.joiningDate) : '-';
     var qrPayload = [
       'AL FIDA HUSSAIN PUBLIC SCHOOLS',
       'TEACHER ID CARD',
@@ -495,61 +497,60 @@ function generateIDCard() {
       'Name: ' + (t.name || ''),
       'Subjects: ' + subjects,
       'Phone: ' + (t.phone || ''),
+      'Email: ' + (t.email || ''),
+      'Join: ' + (t.joiningDate || ''),
       'Session: ' + session,
       'WhatsApp: ' + (settings.whatsapp || '03168122916')
     ].join('\n');
-    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=4&data=' + encodeURIComponent(qrPayload);
+    var qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=' + encodeURIComponent(qrPayload);
+    var schoolName = escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS');
+    var tagline = escapeHtml(settings.tagline || 'Quality Education, Bright Future');
     var html = ''
       + '<div class="id-card-wrap">'
       +   '<div>'
       +     '<div class="id-card-side-label">Front</div>'
-      +     '<div class="id-card">'
-      +       '<div class="id-card-top">'
-      +         '<img src="'+logo+'" alt="Logo">'
-      +         '<div class="school-meta">'
-      +           '<h2>'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</h2>'
-      +           '<p>'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</p>'
+      +     '<div class="tid-card front">'
+      +       '<div class="tid-top">'
+      +         '<img src="'+logo+'" alt="Logo" style="width:36px;height:36px;border-radius:50%;border:2px solid #8bc34a;object-fit:cover;position:relative;z-index:2;background:#fff;">'
+      +         '<div class="tid-school-name" style="margin-top:6px;">'+schoolName+'</div>'
+      +         '<div class="tid-tagline">'+tagline+'</div>'
+      +         '<div class="wave-green"></div>'
+      +         '<div class="tid-logo-ring">'+(photoSrc ? '<img src="'+photoSrc+'" alt="Photo">' : '<i class="fas fa-user-tie" style="font-size:2.2rem;color:#9ca3af;"></i>')+'</div>'
+      +       '</div>'
+      +       '<div class="tid-body">'
+      +         '<h2 class="tid-name">'+escapeHtml(t.name)+'</h2>'
+      +         '<div class="tid-role">Teacher'+(subjects && subjects !== '-' ? ' · '+escapeHtml(subjects) : '')+'</div>'
+      +         '<div class="tid-info">'
+      +           '<div class="row"><span class="lab">ID No</span><span class="val">: '+escapeHtml(t.id)+'</span></div>'
+      +           '<div class="row"><span class="lab">Subjects</span><span class="val">: '+escapeHtml(subjects)+'</span></div>'
+      +           '<div class="row"><span class="lab">Classes</span><span class="val">: '+escapeHtml(classes)+'</span></div>'
+      +           '<div class="row"><span class="lab">Phone</span><span class="val">: '+escapeHtml(t.phone || '-')+'</span></div>'
+      +           '<div class="row"><span class="lab">Email</span><span class="val">: '+escapeHtml(t.email || '-')+'</span></div>'
+      +           '<div class="row"><span class="lab">Join</span><span class="val">: '+escapeHtml(joinDate)+'</span></div>'
+      +           '<div class="row"><span class="lab">Session</span><span class="val">: '+escapeHtml(session)+'</span></div>'
       +         '</div>'
       +       '</div>'
-      +       '<div class="id-card-banner">Teacher Identification Card</div>'
-      +       '<div class="id-card-photo-row">'
-      +         '<div class="id-card-photo">'+photoHtml+'</div>'
-      +         '<div class="id-card-qr">'
-      +           '<img src="'+qrUrl+'" alt="QR Code" title="Scan to verify">'
-      +           '<span>Scan QR</span>'
-      +         '</div>'
-      +       '</div>'
-      +       '<div class="id-card-details">'
-      +         '<div class="row"><span class="label">Name</span><span class="value">: '+escapeHtml(t.name)+'</span></div>'
-      +         '<div class="row"><span class="label">Teacher ID</span><span class="value">: '+escapeHtml(t.id)+'</span></div>'
-      +         '<div class="row"><span class="label">Subjects</span><span class="value">: '+escapeHtml(subjects)+'</span></div>'
-      +         '<div class="row"><span class="label">Classes</span><span class="value">: '+escapeHtml(classes)+'</span></div>'
-      +         '<div class="row"><span class="label">Qualification</span><span class="value">: '+escapeHtml(t.qualification || '-')+'</span></div>'
-      +         '<div class="row"><span class="label">Phone</span><span class="value">: '+escapeHtml(t.phone || '-')+'</span></div>'
-      +         '<div class="row"><span class="label">Session</span><span class="value">: '+escapeHtml(session)+'</span></div>'
-      +       '</div>'
-      +       '<div class="id-card-wave"></div>'
-      +       '<div class="id-card-footer-bar">'
-      +         '<div class="sig"><div class="line">____________</div><span>Principal Signature</span></div>'
-      +         '<div class="sig"><div class="line">____________</div><span>Administrator Signature</span></div>'
-      +       '</div>'
+      +       '<div class="tid-bottom"></div>'
       +     '</div>'
       +   '</div>'
       +   '<div>'
       +     '<div class="id-card-side-label">Back</div>'
-      +     '<div class="id-card back">'
-      +       '<img class="id-card-back-logo" src="'+logo+'" alt="Logo">'
-      +       '<div class="id-card-back-title">'+escapeHtml(settings.schoolName || 'AL FIDA HUSSAIN PUBLIC SCHOOLS')+'</div>'
-      +       '<div class="id-card-back-tag">'+escapeHtml(settings.tagline || 'Quality Education, Bright Future')+'</div>'
-      +       '<img class="id-card-back-qr" src="'+qrUrl+'" alt="QR Code">'
-      +       '<div class="id-card-back-info">'
-      +         '<strong>Staff / Teacher ID Card</strong><br>'
-      +         'Scan QR to verify teacher<br>'
-      +         'WhatsApp / Phone: '+escapeHtml(settings.whatsapp || '03168122916')+'<br>'
-      +         escapeHtml(settings.email || 'info@alfidahussain.edu.pk')+'<br>'
-      +         escapeHtml(settings.address || 'Pakistan')+'<br><br>'
-      +         '<em>This card is property of the school.<br>Misuse is strictly prohibited.</em>'
+      +     '<div class="tid-card back">'
+      +       '<div class="tid-back-top">'
+      +         '<div class="tid-back-title">TERMS AND CONDITIONS</div>'
+      +         '<div class="tid-back-terms">This card is the property of '+schoolName+'. If found, please return to the school office. Unauthorized use is prohibited.</div>'
+      +         '<div class="tid-back-dates">Joined : '+escapeHtml(joinDate)+'<br>Session : '+escapeHtml(session)+'</div>'
+      +         '<div class="wave-green"></div>'
       +       '</div>'
+      +       '<div class="tid-back-body">'
+      +         '<div class="tid-back-sig">____________</div>'
+      +         '<div class="tid-back-sig-name">Principal</div>'
+      +         '<div class="tid-back-sig-role">AL FIDA HUSSAIN PUBLIC SCHOOLS</div>'
+      +         '<img class="tid-back-qr" src="'+qrUrl+'" alt="QR Code">'
+      +         '<div class="tid-back-school">'+schoolName+'</div>'
+      +         '<div class="tid-back-tag">'+tagline+'</div>'
+      +       '</div>'
+      +       '<div class="tid-back-bottom"></div>'
       +     '</div>'
       +   '</div>'
       + '</div>';
